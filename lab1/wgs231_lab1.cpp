@@ -10,6 +10,7 @@
 
 //Mutex used to synchronize ThreadSafeKVStore
 std::mutex mMap;
+int reader_count = 0;
 //Mutex and Condition Variables to synchronize ThreadSafeListenerQueue
 std::mutex mList;
 std::condition_variable cv;
@@ -64,7 +65,9 @@ class ThreadSafeKVStore{
 	@return true if the value is present and false if not
 	*/
 	bool lookup(const K key, V& value){
-		std::lock_guard<std::mutex> lock(mMap);
+		if(reader_count += 1){
+			std::lock_guard<std::mutex> lock(mMap);
+		}
 		auto val = umap.find(key);
 		if(val == umap.end())return false;
 		value = val->second;
@@ -138,7 +141,7 @@ class ThreadSafeListenerQueue{
 	@returns true when an element is removed
 	*/
 	bool listen(T& element){
-		std::lock_guard<std::mutex> lock(mList);
+		std::unique_lock<std::mutex> lock(mList);
 		if(list.empty()){
 			cv.wait(lock);
 			element = list.back();
