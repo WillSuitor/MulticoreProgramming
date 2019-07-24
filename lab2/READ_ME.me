@@ -1,4 +1,7 @@
 Lab 2 - Will Suitor
+To compile:
+g++ -std=c++11 -pthread worker.cpp driver.cpp -o lab2
+
 Thread Pool:
 The thread pool for this program is pretty simple. There is an array of threads in the driver thread (see driver.cpp)
 that are all given the work function (see worker.cpp). There are two threadsafe queues shared between all the threads.
