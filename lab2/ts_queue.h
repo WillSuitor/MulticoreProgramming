@@ -11,7 +11,7 @@
 template<class T>
 class ThreadSafeListenerQueue{
 	private:
-		std::list<T> list;
+		std::list<T> storage;
 
 		//Mutex and Condition Variables to synchronize ThreadSafeListenerQueue
 		std::mutex mList;
@@ -54,7 +54,7 @@ Inserts an item to front of the queue. Returns true if inserted successfully.
 template<class T>
 bool ThreadSafeListenerQueue<T>::push(const T element){
 	std::lock_guard<std::mutex> lock(ThreadSafeListenerQueue<T>::mList);
-	ThreadSafeListenerQueue<T>::list.push_front(element);
+	ThreadSafeListenerQueue<T>::storage.push_front(element);
 	ThreadSafeListenerQueue<T>::cv.notify_one();
 	return true;
 }
@@ -69,9 +69,9 @@ if the list is empty.
 template<class T>
 bool ThreadSafeListenerQueue<T>::pop(T& element){
 	std::lock_guard<std::mutex> lock(ThreadSafeListenerQueue<T>::mList);
-	if(ThreadSafeListenerQueue<T>::list.empty())return false;
-	element = ThreadSafeListenerQueue<T>::list.back();
-	ThreadSafeListenerQueue<T>::list.pop_back();
+	if(ThreadSafeListenerQueue<T>::storage.empty())return false;
+	element = ThreadSafeListenerQueue<T>::storage.back();
+	ThreadSafeListenerQueue<T>::storage.pop_back();
 	return true;
 }
 
@@ -87,9 +87,9 @@ template<class T>
 bool ThreadSafeListenerQueue<T>::listen(T& element){
 	std::chrono::milliseconds mil(1000);
 	std::unique_lock<std::mutex> lock(ThreadSafeListenerQueue<T>::mList);
-	if(cv.wait_for(lock, mil, [this]{return !(this->list.empty());})){
-		element = ThreadSafeListenerQueue<T>::list.back();
-		ThreadSafeListenerQueue<T>::list.pop_back();
+	if(cv.wait_for(lock, mil, [this]{return !(this->storage.empty());})){
+		element = ThreadSafeListenerQueue<T>::storage.back();
+		ThreadSafeListenerQueue<T>::storage.pop_back();
 		return true;
 	}
 	else{

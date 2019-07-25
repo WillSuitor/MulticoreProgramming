@@ -47,82 +47,18 @@ the coefficients and the degree of the polynomial.
 std::vector<float> Worker::mutate(std::vector<float> coefficients, float random, const std::pair<int, int> randInd, const std::vector< std::pair<float, float> > INIT_POINTS){
 	std::vector<float> mutated;
 	int coeffSize = coefficients.size();
-	float fitness = Worker::fitness(coefficients, INIT_POINTS);	
-	random = random / 5;
-	if(fitness < 15)random = random / 5;
-	float rands[coeffSize];
-	rands[0] = random;
-	for(int i = 1; i < coeffSize; i++){
-		rands[i] = random / (i*3);
+	mutated = coefficients;
+	std::random_device randy;
+	std::mt19937 engy(randy());
+	std::uniform_int_distribution<> distry(1, 5);
+	if(coeffSize == 0)return mutated;
+	if(Worker::fitness(coefficients, INIT_POINTS) < 2.5 && coeffSize > 3){
+		random = random / 10;
 	}
-	switch(randInd.first){
-		//Cases that alter the entire set of coefficients
-		case 0:
-			switch(randInd.second)
-			{
-			case 1:
-				for(int i = 0; i < coeffSize; i++){
-					if(i % 2){
-						mutated.push_back(coefficients[i] + rands[i]);
-					}
-					else{
-						mutated.push_back(coefficients[i] - rands[i]);
-					}
-				}
-				break;
-			case 2:
-				for(int i = 0; i < coeffSize; i++){
-					if(i % 2){
-						mutated.push_back(coefficients[i] - rands[i]);
-					}
-					else{
-						mutated.push_back(coefficients[i] + rands[i]);
-					}
-				}
-				break;
-			case 3:
-				for(int i = 0; i < coeffSize; i++){
-					mutated.push_back(coefficients[i]-rands[i]);
-				}
-				break;
-			case 4:
-				for(int i = 0; i < coeffSize/2; i++){
-					mutated.push_back(coefficients[i]-rands[i]);
-				}
-				for(int i = coeffSize/2; i < coeffSize; i++){
-					mutated.push_back(coefficients[i]+rands[i]);
-				}
-				break;
-			case 5:
-				for(int i = 0; i < coeffSize/2; i++){
-					mutated.push_back(coefficients[i]+rands[i]);
-				}
-				for(int i = coeffSize/2; i < coeffSize; i++){
-					mutated.push_back(coefficients[i]-rands[i]);
-				}
-				break;
-			case 6:
-				for(int i = 0; i < coeffSize; i++){
-					mutated.push_back(-coefficients[i]);
-				}
-				break;
-			default:
-				for(int i = 0; i < coeffSize; i++){
-					mutated.push_back(coefficients[i]+rands[i]);
-				}
-				break;
-			}
-		break;
-		//Cases that alter only some of the coefficients (this case is hit more)
-		default:
-			mutated = coefficients;
-			std::random_device randy;
-			std::mt19937 engy(randy());
-			std::uniform_int_distribution<> distry(1, 3);
-			for(int i = 0; i < coeffSize; i++){
-				mutated[i] = Worker::mutOne(mutated[i], rands[i], distry(engy));
-			}
-		}
+	mutated[0] = Worker::mutOne(mutated[0], random, distry(engy));
+	for(int i = 1; i < coeffSize; i++){
+		mutated[i] = Worker::mutOne(mutated[i], random/i, distry(engy));
+	}
 	return mutated;
 }
 
@@ -137,12 +73,17 @@ Function that takes a coefficient and performs random modification on it. Return
 */
 float Worker::mutOne(float coeff, float random, int randInd){
 	float mutated = coeff;
-	int fakeSwitch = randInd % 3;
-	if(fakeSwitch == 1){
+	if(randInd == 1){
 		mutated = mutated - random;
 	}
-	else if (fakeSwitch == 2){
+	else if (randInd == 2){
 		mutated = mutated + random;
+	}
+	else if (randInd == 3){
+		mutated = mutated * random;
+	}
+	else if(randInd == 4){
+		mutated = mutated / random;
 	}
 	return mutated;
 }
