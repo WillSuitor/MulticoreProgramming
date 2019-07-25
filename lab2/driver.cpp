@@ -136,7 +136,6 @@ int main(int argc, char ** argv){
 					coefficients[i] = newCoeffs[i];
 				}
 				currentFitness = Worker::fitness(coefficients, INIT_POINTS);
-				std::cout << currentFitness << std::endl;
 			}
 			else if(iteration_count > (30000*DEGREE)){
 				//This is hit because the program has hit a wall
