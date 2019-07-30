@@ -5,3 +5,7 @@ hw1
 hw2
 100
 -0 = Q2 no deductions but please see the solution on lecture slides
+
+hw3
+94
+-0 = Q3 it "is" a bug to return in if statement for nan because the function will return without unlocking; -6 = Q3 missing a bug that two different mutices are used for the global resources in two functions;
