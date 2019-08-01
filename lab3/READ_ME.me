@@ -1,0 +1,41 @@
+Test Set-Up: 
+Repurposed driver thread to become a function called in test.cpp. Completely removed the
+user entry for degree and number of threads (became arguments for driver::solve()). Test
+runs solve() some number of times with variable degree and number of threads set.
+
+*A term I use in the documentation a lot is reseed. By that, I mean giving the program a completely new set of random coefficients
+and removing all the old ones. Specifically, this occurs in driver line 132-151.
+
+
+*When testing changes, I'm only running tests on the 2nd and 3rd degree polynomials. As the
+2nd and 3rd degree polynomials are correlated to how the 4th and 5th degree polynomials perform,
+it seems safe to assume that if they improve so will the 4th and 5th. After having included the changes
+that aid performance, I will retest the 4th and 5th degree polynomials. However, on starting performance,
+having to test those (in addition to including the different number of threads) would be prohibitively long.
+
+Changes:
+1. Added a case that changes the sign of the coefficients. Specifically, the change is lines 85-87 in Worker::mutOne(). The theory
+behind this change is to make sure that the orientation of the polynomials can be changed without having to reseed (ie the polynomial
+opening up or down, left or right).  
+
+2. Added something that reduces the amount of random change as fitness increases. Specifically, removed the lines in Worker::mutate() where
+the variable random would be divided by 10 if the currentFitness was less than 2.5. I implemented this change after noticing that performance
+got progressively worse when I tried to further divide random and alter it in accordance to fitness. 
+
+3. Altered when the reseed happens and removed the bias for random alteration with coefficients. Specifically, I altered Driver line 132 to reduce the
+number of iterations it takes before a reseed. Previously, it was 30,000*DEGREE and now 20,000*DEGREE.
+In addition, I removed the alteration of random with respect to coefficients in line 57 in worker (previously random was random/i). I implemented this
+change after noting the success of change 2.
+
+
+Failed Changes (tests for these not included):
+1. Included bitwise operations in Worker::mutOne() - this change slowed down the program significantly. I believe it is partially because of how I had
+to manipulate the floating point numbers into integers, perform the bitwise operation, then cast them back to float. I think it also produced too large
+of a change. 
+
+2. Decreasing random as coefficients improved- This is the change I am most surprised failed. It seemed like it would make sense that the closer you got
+to a fit, the less random change you should use. However, this significantly slowed down my performance enough to prompt me to try the opposite change.
+
+3. Removing the reseed entirely - This change didn't work as my program occassionally gets stuck improving a certain set of coefficients that will never
+be able to perfectly fit to the points. However, if I were to continue to work on this program, I would hope to eventually reach a point where I could
+remove the reseed. 
