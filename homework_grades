@@ -9,3 +9,7 @@ hw2
 hw3
 94
 -0 = Q3 it "is" a bug to return in if statement for nan because the function will return without unlocking; -6 = Q3 missing a bug that two different mutices are used for the global resources in two functions;
+
+hw4
+93.75
+-0 = Q3(b) more explanation would have been good; -6.25 = Q4(b) should mention caching would work with x86 like architectures 
